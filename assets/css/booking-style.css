@@ -1,0 +1,509 @@
+.header-wrap {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    border-bottom: 1px solid grey;
+    align-items: center;
+    padding-left: 20px;
+}
+.am-page-title {
+    border-left: 1px solid #e2e6ec;
+    padding-left: 24px!important;
+    vertical-align: middle;
+    line-height: 1.9;
+    padding:0px;
+}
+.am-logo {
+    padding: 0 24px 0 0!important;
+    font-weight: 800!important;
+
+}
+.wrap-background-grey {
+    background: #f0f0f1 !important;
+}
+.wrap-background-white {
+    background: #fff;
+}
+.wrap {
+    color: #3c434a;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    font-size: 13px;
+    line-height: 1.4em;
+    display: flex;
+    flex-direction: column;
+}
+svg.inlined-svg {
+    display: inline-block;
+    vertical-align: sub;
+    margin-right: 8px;
+    max-width: 24px;
+    max-height: 24px;
+}
+
+@media(min-width:1076px) {
+    .wrap-content-settings {
+        display: flex;
+        flex-direction: column;
+        flex-basis: 50%;
+        position: relative;
+    }
+    .wrap-content-menu {
+        display: flex;
+        flex-direction: column;
+        flex-basis: 50%;
+        position: relative;
+    }
+    .window-wrap {
+        background: #fff;
+        position: absolute;
+        overflow-y: auto;
+        bottom: 0;
+        top: 0;
+        right: 0;
+        left: 100%;
+        transition: right 1s ease;
+        min-width:520px;
+        max-height: 100%;
+        margin-bottom: -220px;
+    }
+    .content-frame {
+        flex-direction: row;
+    }
+}
+
+@media(max-width:1075px) {
+    .wrap-content-settings {
+        display: flex;
+        flex-direction: column;
+        flex-basis: 100%;
+        z-index: 2000;
+    }
+    .wrap-content-menu {
+        display: flex;
+        flex-direction: column;
+        flex-basis: 100%;
+
+    }
+    .window-wrap {
+        background: #fff;
+        position: absolute;
+        overflow-y: hidden;
+        bottom: 0;
+        top: 0;
+        right: 0;
+        left: 100%;
+        transition: right 1s ease;
+    }
+    .content-frame {
+        position: relative;
+    }
+    .auto-fold #wpcontent {
+            position: relative;
+            margin-left: 0;
+            padding-left: 0px;
+    }
+    .content-frame {
+        flex-direction: column;
+    }
+    .window-wrap-ajax {
+        padding:24px;
+        transition: left 1s ease;
+        min-width:300px;
+    }
+}
+
+.wrap-conent-column {
+    border-right: 1px solid #e2e6ec;
+    margin: 48px;
+    padding-bottom: 48px;
+    position: relative;
+}
+.am-settings-card .link {
+    min-height: 0;
+    color: #1a84ee;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    text-transform: uppercase;
+    margin-bottom: 0;
+}
+.wrap-conent-column {
+    border-right: none!important;
+}
+.content-frame {
+    display: flex;
+}
+.window-wrap-ajax {
+    padding:24px;
+    transition: left 1s ease;
+}
+.window-wrap-ajax-left {
+    left: 0;
+}
+.button-row {
+    margin-top: 30px;
+    position: relative;
+    display: flex;
+    justify-content: flex-end;
+    width: 90%;
+}
+.button-primary-save {
+    color: #fff;
+    background-color: #1a84ee;
+    border-color: #1a84ee;
+}
+.button-primary-save:hover {
+    color: #fff;
+    background-color: #1077de;
+}
+.dialog-header {
+    border-bottom: 2px solid #e2e6ec;
+    padding-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+}
+.dialog-header h2 {
+    font-size: 20px;
+    line-height: 1.5;
+    font-weight: 400;
+}
+.close-button {
+    margin-left: 8px;
+    height:24px;
+    width:24px;
+}
+.button-primary-cancel, .button-primary-save {
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: .1s;
+    font-weight: 500;
+    padding: 12px 20px;
+    font-size: 14px;
+    width:100px;
+}
+.button-primary-save {
+    margin-left:10px;
+}
+.button-primary-cancel {
+    background: #fff;
+    border: 1px solid #dcdfe6;
+}
+.button-primary-cancel:hover {
+    color: #1a84ee;
+    border-color: #1a84ee;
+}
+.options-wrap {
+    margin:40px 0;
+}
+.select-frame {
+    margin: 25px 0;
+    display: flex;
+}
+.select-frame label {
+    width: 400px;
+}
+.el-input-number {
+    position: relative;
+    display: inline-block;
+    width: 180px;
+    line-height: 38px;
+}
+.el-input {
+    position: relative;
+    font-size: 14px;
+    display: inline-block;
+    width: 100%;
+}
+.el-input-number__decrease {
+    left: 1px;
+    border-radius: 4px 0 0 4px;
+    border-right: 1px solid #dcdfe6;
+}
+.el-input-number__increase {
+    right: 1px;
+    border-radius: 0 4px 4px 0;
+    border-left: 1px solid #dcdfe6;
+}
+.el-input-number .el-input__inner {
+    padding-left: 50px;
+    padding-right: 50px;
+    text-align: center;
+}
+.el-input-number__decrease, .el-input-number__increase {
+    position: absolute;
+    z-index: 1;
+    top: 1px;
+    width: 40px;
+    height: auto;
+    text-align: center;
+    background: #f5f7fa;
+    color: #606266;
+    cursor: pointer;
+    font-size: 13px;
+}
+.el-form-item__content {
+    position: relative;
+    font-size: 14px;
+}
+.el-input-number .el-input {
+    display: block;
+    border: 1px solid #e2e6ec;
+}
+.el-input-number {
+    width: 100%;
+}
+
+.el-input-number__decrease:hover,
+.el-input-number__increase:hover {
+    border: 1px solid #1a84ee;
+}
+.el-input input {
+    border:none!important;
+}
+input.el-input__inner:focus {
+    box-shadow: none;
+}
+.tab {
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+}
+.tab button {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+    font-size: 17px;
+}
+.tab button:hover {
+    background-color: #ddd;
+}
+.tab button.active {
+    background-color: #ccc;
+}
+.tabcontent {
+    display: none;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-top: none;
+}
+.am-dialog-table .el-row.am-dialog-table-head {
+    background-color: #f2f3f5;
+    font-weight: 700;
+    margin-top: 16px;
+}
+.am-dialog-table .el-row.am-dialog-table-head.hours {
+    padding: 4px 0;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+}
+.el-col-12 {
+    width: 50%;
+}
+.am-side-dialog .el-dialog .am-add-element {
+    color: #1a84ee;
+    display: inline-block;
+    padding: 0 4px;
+    cursor: pointer;
+    margin-right: 8px;  
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+}
+.el-icon-plus {
+    margin-right: 4px;
+    border-radius: 50%;
+    border: 1px solid #e2e6ec;
+    padding: 4px;
+    font-size: 10px;
+    width: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor:pointer;
+}
+.el-icon-plus:hover {
+    background-color: #1a84ee;
+    color: #fff;
+}   
+.el-icon-day-plus {
+    margin-right: 4px;
+    border-radius: 50%;
+    border: 1px solid #e2e6ec;
+    padding: 4px;
+    font-size: 10px;
+    width: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor:pointer;
+}
+.el-icon-day-plus:hover {
+    background-color: #1a84ee;
+    color: #fff;
+}  
+span.am-add-element {
+    padding-right: 20px;
+}
+.plus-icon-frame {
+    display: flex;
+    justify-content: flex-end;
+}
+.column-right {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+.column-right-day {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.el-input--mini .el-input__inner {
+    height: 28px;
+    line-height: 28px;
+    border: 1px solid #e2e6ec !important;
+    width: 100%;
+}
+.el-button.el-button--primary {
+    color: #fff;
+    background-color: #1a84ee;
+    border-color: #1a84ee;
+}
+.el-button.el-button--primary:hover {
+    color: #fff;
+    background-color: #409eff;
+    border-color: #1a84ee;
+}
+.el-button--default:hover {
+    color: #1a84ee;
+    border: 1px solid #1a84ee;
+}
+.el-button--mini, .el-button--small {
+    font-size: 12px;
+    border-radius: 3px;
+}
+.added-hours {
+    height: 30px;
+    border: 1px solid grey;
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+    font-weight: 600;
+    justify-content: space-between;
+}
+.el-button {
+    display: inline-block;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    background: #fff;
+    border: 1px solid #dcdfe6;
+    padding: 5px 10px;
+    text-align: center;
+    box-sizing: border-box;
+    outline: 0;
+    margin: 0;
+    transition: .1s;
+    font-weight: 500;
+}
+.time-select-container {
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 9999;
+}
+.time-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.time-select-item {
+    padding: 5px 10px;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    transition: background-color 0.2s;
+}
+.time-select-item:hover {
+    background-color: #f0f0f0;
+}
+.cancel-button {
+    margin-top: 10px;
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    width: 100%;
+}
+.cancel-button:hover {
+    background-color: darkred;
+}
+.days-frame {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    margin-bottom: 5px;
+    padding: 5px 0;
+}
+.date-free-frame,.date-name-frame {
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+}
+.date-free-frame input,.date-name-frame input {
+    outline: none;
+}
+.am-add-period {
+    margin-top: 10px;
+    border: 2px solid green;
+}
+.say-set-name {
+    display: flex;
+    justify-content: flex-start;
+    width: 15%;
+}
+.am-working-days {
+    position: relative;
+}
+.am-add-period-days {
+    width: 97%;
+    z-index: 2000;
+    position: absolute;
+    padding: 10px;
+    left: 0px;
+    right: 0px;
+    background-color: gray;
+}
+.warning-message {
+    padding: 10px;
+    color: red;
+}
+.wp-list-table th, .wp-list-table td {
+    padding: 8px;
+    text-align: left;
+}
+
+.wp-list-table th {
+    background-color: #f1f1f1;
+}
+
+td.btnAction {
+    display: flex;
+    justify-content: space-between;
+}
+
+.widefat thead tr th {
+    font-weight:60!important;    
+}
