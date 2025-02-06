@@ -44,8 +44,13 @@ class Zwik_API extends Zwik_Booking
 
 
     public function custom_submission_callback(\WP_REST_Request $request) {
+
+        header("Access-Control-Allow-Origin: https://zwik.olawa.pl/bok");
+        header("Content-Type: application/json");
+        header("Cache-Control: no-cache");
+        header("Connection: keep-alive");
         global $wpdb;
-    
+        
         $target = sanitize_text_field($request->get_param('target'));
         $desk = sanitize_text_field($request->get_param('desk')) ?: '';
         $date = sanitize_text_field($request->get_param('date'));
@@ -53,13 +58,39 @@ class Zwik_API extends Zwik_Booking
         $subject = sanitize_text_field($request->get_param('subject')) ?: '';
         $control_number = sanitize_text_field($request->get_param('control_number'));
         $status = sanitize_text_field($request->get_param('status'));
-    
+
+        error_log('date format: ' . $date);
+        
+
         if (preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/', $date)) {
+
             $dateTime = new \DateTime($date);
             $dateTime->setTimezone(new \DateTimeZone('Europe/Warsaw'));
-    
             $formattedDate = $dateTime->format('Y-m-d');
             $formattedTime = $dateTime->format('H:i');
+        } elseif (preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2} - \d{2}:\d{2}$/', $date)) {
+            list($startTime, $endTime) = explode(' - ', $date);
+            $dateTime = new \DateTime($startTime);
+            $dateTime->setTimezone(new \DateTimeZone('Europe/Warsaw'));
+            $formattedDate = $dateTime->format('Y-m-d');
+            $formattedTime = $dateTime->format('H:i');
+            
+            $existingBooking = $wpdb->get_var($wpdb->prepare(
+                "SELECT COUNT(*) FROM {$wpdb->prefix}zwik_booking 
+                 WHERE STR_TO_DATE(date, '%%Y-%%m-%%d %%H:%%i') BETWEEN %s AND %s 
+                 AND desk = %s",
+                "{$formattedDate} {$formattedTime}:00",
+                "{$formattedDate} {$formattedTime}:59",
+                $desk
+            ));
+            
+            
+            if ($existingBooking > 0) {
+                return new \WP_REST_Response([
+                    'success' => false,
+                    'message' => 'The selected time slot is already booked.'
+                ], 400);
+            }
         }
     
         if ($target === 'UM') {
@@ -68,9 +99,9 @@ class Zwik_API extends Zwik_Booking
             if ($nextAvailableSlot) {
                 $date = "{$formattedDate} {$nextAvailableSlot}";
             }
-            $date = $this->ensure_unique_time_slot($formattedDate, $date);
+            $date = $this->ensure_unique_time_slot($formattedDate, $date, $desk);
         }
-    
+        
         if ($target === "ZWIK") {
             $role_users = get_users(array(
                 'role' => 'harmonogram_manager',
@@ -79,19 +110,23 @@ class Zwik_API extends Zwik_Booking
             
             $userCount = count($role_users);
             
+            error_log('count users: ' . $userCount );
+        
             if ($userCount === 1) {
                 $desk = 'Stanowisko 1';
                 $nextAvailableSlot = $this->get_next_available_time_slot($formattedDate, $formattedTime);
                 if ($nextAvailableSlot) {
                     $date = "{$formattedDate} {$nextAvailableSlot}";
                 }
-                $date = $this->ensure_unique_time_slot($formattedDate, $date);
+                $date = $this->ensure_unique_time_slot($formattedDate, $formattedTime, $desk);
             } else {
                 if ($userCount === 2) {
                     $availableDesks = ['Stanowisko 1', 'Stanowisko 2'];
-                } elseif ($userCount === 3) {
+                } elseif ($userCount > 2) {
                     $availableDesks = ['Stanowisko 1', 'Stanowisko 2', 'Stanowisko 3'];
                 }
+        
+                $excluded_desk = 'Stanowisko 4';
         
                 $nextAvailableSlot = $this->get_next_available_time_slot_for_zwik($formattedDate, $formattedTime);
                 if ($nextAvailableSlot) {
@@ -99,22 +134,28 @@ class Zwik_API extends Zwik_Booking
                 }
         
                 $bookedDesks = $wpdb->get_col($wpdb->prepare(
-                    "SELECT desk FROM {$wpdb->prefix}zwik_booking WHERE DATE(date) = %s AND TIME(date) = %s",
-                    $formattedDate,
-                    $nextAvailableSlot
+                    "SELECT desk FROM {$wpdb->prefix}zwik_booking 
+                     WHERE desk != %s 
+                     AND STR_TO_DATE(date, '%%Y-%%m-%%d %%H:%%i') = STR_TO_DATE(%s, '%%Y-%%m-%%d %%H:%%i')",
+                    $excluded_desk,
+                    "{$formattedDate} {$nextAvailableSlot}"
                 ));
+                
+                error_log('bookedDesks: ' . print_r($bookedDesks, true));
         
                 $remainingDesks = array_diff($availableDesks, $bookedDesks);
+        
+                error_log('$remainingDesks' . print_r($remainingDesks, true));
         
                 if (!empty($remainingDesks)) {
                     $desk = reset($remainingDesks);
                 } else {
-                    $nextAvailableSlot = $this->ensure_unique_time_slot($formattedDate, $date);
                     $desk = 'Stanowisko 1';
+                    $nextAvailableSlot = $this->ensure_unique_time_slot($formattedDate, $formattedTime, $desk);
                 }
             }
         }
-    
+        
         $table_name = $wpdb->prefix . 'zwik_booking';
         $result = $wpdb->insert(
             $table_name,
@@ -129,7 +170,7 @@ class Zwik_API extends Zwik_Booking
             ],
             ['%s', '%s', '%s', '%s', '%s', '%s', '%s']
         );
-    
+        
         if ($result === false) {
             error_log('Database Insert Error: ' . $wpdb->last_error);
             return new \WP_REST_Response([
@@ -137,13 +178,14 @@ class Zwik_API extends Zwik_Booking
                 'message' => 'Database error: ' . $wpdb->last_error
             ], 500);
         }
-    
+        
         return new \WP_REST_Response([
             'success' => true,
             'message' => 'Data successfully saved',
             'insert_id' => intval($wpdb->insert_id)
         ], 200);
     }
+    
     
     
     
@@ -168,10 +210,11 @@ class Zwik_API extends Zwik_Booking
                 //error_log("Skipping past/booked slot: $startTime");
                 continue;
             }
-    
+            $desk_4 = 'Stanowisko 4';
             $alreadyBooked = $wpdb->get_var($wpdb->prepare(
-                "SELECT COUNT(*) FROM {$wpdb->prefix}zwik_booking WHERE date = %s",
-                "$date $startTime"
+                "SELECT COUNT(*) FROM {$wpdb->prefix}zwik_booking WHERE date = %s AND desk != %s",
+                "$date $startTime",
+                 $desk_4
             ));
     
             if ($alreadyBooked < 3) {
@@ -191,8 +234,8 @@ class Zwik_API extends Zwik_Booking
         $availableSlots = $this->get_available_slots_for_date($date);
     
         $bookedSlots = $wpdb->get_col($wpdb->prepare(
-            "SELECT DATE_FORMAT(date, '%H:%i') FROM {$wpdb->prefix}zwik_booking WHERE DATE(date) = %s",
-            $date
+            "SELECT DATE_FORMAT(date, '%H:%i') FROM {$wpdb->prefix}zwik_booking WHERE DATE(date) = %s AND desk != S",
+            $date,
         ));
         error_log('Booked Slots from DB: ' . print_r($bookedSlots, true));
     
@@ -238,15 +281,16 @@ class Zwik_API extends Zwik_Booking
         return [];
     }
 
-    private function ensure_unique_time_slot($date, $selectedDateTime) {
+    private function ensure_unique_time_slot($date, $selectedDateTime, $desk) {
         global $wpdb;
     
         $selectedTime = date('H:i', strtotime($selectedDateTime));
     
         $table_name = $wpdb->prefix . 'zwik_booking';
         $existing = $wpdb->get_var($wpdb->prepare(
-            "SELECT COUNT(*) FROM $table_name WHERE date = %s",
-            $selectedDateTime
+            "SELECT COUNT(*) FROM $table_name WHERE date = %s AND desk = %",
+            $selectedDateTime,
+            $desk
         ));
     
         if ($existing > 0) {
@@ -266,6 +310,12 @@ class Zwik_API extends Zwik_Booking
     
 
     public function custom_settings_callback() {
+
+        header("Access-Control-Allow-Origin: https://zwik.olawa.pl/bok");
+        header("Content-Type: application/json");
+        header("Cache-Control: no-cache");
+        header("Connection: keep-alive");
+
         date_default_timezone_set('Europe/Warsaw');
     
         $calendar_range_days = (int)get_option('zwik_duration_calendar');
@@ -377,7 +427,7 @@ class Zwik_API extends Zwik_Booking
 
     public function custom_sse_callback() {
 
-    header("Access-Control-Allow-Origin: http://localhost:5173");
+    header("Access-Control-Allow-Origin: https://zwik.olawa.pl/telebim-1");
     header("Content-Type: application/json");
     header("Cache-Control: no-cache");
     header("Connection: keep-alive");
