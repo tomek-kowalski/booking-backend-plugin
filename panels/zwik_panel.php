@@ -79,7 +79,6 @@ class Zwik_panel{
                         <th>Godzina</th>
                         <th>Imię</th>
                         <th>Temat</th>
-                        <th>Liczba kontrolna</th>
                         <th>Status</th>
                         <th>Akcja</th
                     </tr>
@@ -101,7 +100,6 @@ class Zwik_panel{
                     <td>{$formatted_time}</td>
                     <td>{$record->name}</td>
                     <td>{$record->subject}</td>
-                    <td>{$record->control_number}</td>
                     <td>
                                 <button class='change-status' data-id='{$record->id}' " . ($record->status === "Zakończone" ? "disabled" : "") . ">
                                 {$record->status}
@@ -170,7 +168,6 @@ class Zwik_panel{
                     <td>{$formatted_time}</td>
                     <td>{$record->name}</td>
                     <td>{$record->subject}</td>
-                    <td>{$record->control_number}</td>
                     <td>
                         <button class='change-status' data-id='{$record->id}' " . ($record->status === "Zakończone" ? "disabled" : "") . ">
                         {$record->status}
