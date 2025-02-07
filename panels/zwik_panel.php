@@ -150,11 +150,18 @@ class Zwik_panel{
     
         foreach ($records as $record) {
             try {
-                $datetime = new \DateTime($record->date, new \DateTimeZone('Europe/Warsaw'));
-    
-                $formatted_date = $datetime->format('Y.m.d');
-                $formatted_time = $datetime->format('H:i');
-    
+                $dateString = $record->date;
+        
+                if (preg_match('/(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})/', $dateString, $matches)) {
+                    $formatted_date = $matches[1];
+                    $formatted_time = $matches[2]; 
+                } else {
+
+                    $datetime = new \DateTime($dateString, new \DateTimeZone('Europe/Warsaw'));
+                    $formatted_date = $datetime->format('Y.m.d'); 
+                    $formatted_time = $datetime->format('H:i');
+                }
+        
                 echo "<tr>
                     <td>{$record->id}</td>
                     <td>{$record->target}</td>
@@ -168,17 +175,17 @@ class Zwik_panel{
                         <button class='change-status' data-id='{$record->id}' " . ($record->status === "Zakończone" ? "disabled" : "") . ">
                         {$record->status}
                         </button>
-
                     </td>
                     <td>
                         <button class='delete-row' data-id='{$record->id}'>Usuń</button>
                     </td>
                 </tr>";
-    
+        
             } catch (\Exception $e) {
                 error_log("Error parsing date for ID {$record->id}: " . $e->getMessage());
             }
         }
+        
     
         wp_die();
     }

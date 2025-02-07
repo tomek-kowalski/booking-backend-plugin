@@ -8,13 +8,17 @@ if (!defined('WPINC')) {
 require_once ZWIK_PATH . 'zwik_booking.php';
 
 class Zwik_API extends Zwik_Booking
+
 {
+    private $last_sent_data = null;
     public function __construct()
     {
         parent::__construct();
         add_action('rest_api_init', [$this, 'register_api_booking']);
         add_action('rest_api_init', [$this, 'register_api_form_settings']);
         add_action('rest_api_init', [$this, 'register_api_form_submission']);
+
+        add_filter('rest_pre_serve_request', [$this, 'prevent_cache_for_sse'], 10, 4);
     }
 
     public function register_api_booking()
@@ -424,10 +428,18 @@ class Zwik_API extends Zwik_Booking
         return $time_slots;
     }
 
+    public function prevent_cache_for_sse($served, $result, $request, $server) {
+        if ($request->get_route() === '/wp-json/custom/v1/sse') {
+            header("Cache-Control: no-cache, must-revalidate");
+            header("Expires: 0");
+        }
+        return $served;
+    }
+
 
     public function custom_sse_callback() {
 
-    header("Access-Control-Allow-Origin: https://zwik.olawa.pl/telebim-1");
+    header("Access-Control-Allow-Origin: *");
     header("Content-Type: application/json");
     header("Cache-Control: no-cache");
     header("Connection: keep-alive");
@@ -442,6 +454,7 @@ class Zwik_API extends Zwik_Booking
     );
 
     $data = [];
+
     foreach ($results as $row) {
         $data[] = [
             'id'     => $row->id,
@@ -454,7 +467,6 @@ class Zwik_API extends Zwik_Booking
 
     return rest_ensure_response($data);
     }
-
 }
 
 
